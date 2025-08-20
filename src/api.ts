@@ -34,7 +34,7 @@ export const authenticatedApiCall = async <T>(
     const headers = createAuthHeaders(tokens);
     
     const config = {
-      apiName: 'allyapi',
+      apiName: 'apia969530c',
       path,
       options: {
         headers,
@@ -72,7 +72,7 @@ export const authenticatedApiCall = async <T>(
 export async function listItems() {
   try {
     const res = await get({
-      apiName: 'allyapi',
+      apiName: 'apia969530c',
       path: '/v1/items',
       options: {
         headers: await getAuthHeaders(),

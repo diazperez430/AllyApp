@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"14.0.0\",\"stackType\":\"function-Lambda\",\"metadata\":{\"whyContinueWithGen1\":\"Gen 2 is missing features I need from Gen 1\"}}",
+  "Description": "{\"createdOn\":\"Windows\",\"createdBy\":\"Amplify\",\"createdWith\":\"14.0.0\",\"stackType\":\"function-Lambda\",\"metadata\":{\"whyContinueWithGen1\":\"Prefer not to answer\"}}",
   "Parameters": {
     "CloudWatchRule": {
       "Type": "String",
@@ -47,12 +47,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "ally845d9ca4",
+            "allyapp59297cf3",
             {
               "Fn::Join": [
                 "",
                 [
-                  "ally845d9ca4",
+                  "allyapp59297cf3",
                   "-",
                   {
                     "Ref": "env"
@@ -89,12 +89,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "allyLambdaRole99c38810",
+            "allyappLambdaRole91da91c7",
             {
               "Fn::Join": [
                 "",
                 [
-                  "allyLambdaRole99c38810",
+                  "allyappLambdaRole91da91c7",
                   "-",
                   {
                     "Ref": "env"

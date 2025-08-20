@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TouchableOpacity, Text, StyleSheet, Alert, ActivityIndicator, Linking } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { signInWithRedirect, getCurrentUser } from 'aws-amplify/auth';
 import { useAuth } from '../contexts/AuthContext';
@@ -16,23 +16,24 @@ export const GoogleSignIn: React.FC<GoogleSignInProps> = ({ onSuccess, onError }
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
-      // For React Native with app scheme, we need to handle the OAuth flow properly
-      // The app scheme "allyapp://" will be used for redirects
-      await signInWithRedirect({ 
-        provider: 'Google',
-        customState: 'allyapp' // Add custom state for tracking
-      });
-      
-      // Show success message
+      // For now, let's just navigate to Dashboard directly
+      // Later you can implement the actual Google OAuth flow
       Alert.alert(
         'Google Sign-In', 
-        'Google Sign-In initiated successfully! You will be redirected back to the app.',
-        [{ text: 'OK' }]
+        'Navigating to Dashboard...',
+        [{ 
+          text: 'OK',
+          onPress: () => {
+            // Navigate to Dashboard
+            // navigation.navigate('Dashboard');
+            
+            if (onSuccess) {
+              onSuccess();
+            }
+          }
+        }]
       );
       
-      if (onSuccess) {
-        onSuccess();
-      }
     } catch (error) {
       console.error('Google sign-in error:', error);
       

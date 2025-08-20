@@ -1,10 +1,10 @@
 {
   "version": "1",
   "cognitoConfig": {
-    "identityPoolName": "allyab79b52b_identitypool_ab79b52b",
+    "identityPoolName": "allyapp3dc9dd13_identitypool_3dc9dd13",
     "allowUnauthenticatedIdentities": false,
-    "resourceNameTruncated": "allyab79b52b",
-    "userPoolName": "allyab79b52b_userpool_ab79b52b",
+    "resourceNameTruncated": "allyap3dc9dd13",
+    "userPoolName": "allyapp3dc9dd13_userpool_3dc9dd13",
     "autoVerifiedAttributes": [
       "email"
     ],
@@ -31,20 +31,15 @@
     "userpoolClientReadAttributes": [
       "email"
     ],
-    "userpoolClientLambdaRole": "allyabab79b52b_userpoolclient_lambda_role",
+    "userpoolClientLambdaRole": "allyap3dc9dd13_userpoolclient_lambda_role",
     "userpoolClientSetAttributes": false,
-    "sharedId": "ab79b52b",
-    "resourceName": "allyab79b52b",
+    "sharedId": "3dc9dd13",
+    "resourceName": "allyapp3dc9dd13",
     "authSelections": "identityPoolAndUserPool",
-    "useDefault": "defaultSocial",
-    "hostedUI": true,
+    "useDefault": "default",
     "usernameAttributes": [
-      "email, phone_number"
+      "email"
     ],
-    "hostedUIDomainName": "ally-login",
-    "authProvidersUserPool": [],
-    "hostedUIProviderMeta": "[]",
-    "oAuthMetadata": "{\"AllowedOAuthFlows\":[\"code\"],\"AllowedOAuthScopes\":[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"],\"CallbackURLs\":[\"http://localhost:19006/\",\"https://ally.com.au/\"],\"LogoutURLs\":[\"http://localhost:19006/\",\"https://ally.com.au/\"]}",
     "userPoolGroupList": [],
     "serviceName": "Cognito",
     "usernameCaseSensitive": false,

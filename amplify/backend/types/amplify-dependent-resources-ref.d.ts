@@ -1,26 +1,24 @@
 export type AmplifyDependentResourcesAttributes = {
   "api": {
-    "allyapi": {
+    "apia969530c": {
       "ApiId": "string",
       "ApiName": "string",
       "RootUrl": "string"
     }
   },
   "auth": {
-    "allyab79b52b": {
+    "allyapp3dc9dd13": {
       "AppClientID": "string",
       "AppClientIDWeb": "string",
-      "HostedUIDomain": "string",
       "IdentityPoolId": "string",
       "IdentityPoolName": "string",
-      "OAuthMetadata": "string",
       "UserPoolArn": "string",
       "UserPoolId": "string",
       "UserPoolName": "string"
     }
   },
   "function": {
-    "ally845d9ca4": {
+    "allyapp59297cf3": {
       "Arn": "string",
       "LambdaExecutionRole": "string",
       "LambdaExecutionRoleArn": "string",

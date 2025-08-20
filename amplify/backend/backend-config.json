@@ -1,6 +1,6 @@
 {
   "api": {
-    "allyapi": {
+    "apia969530c": {
       "dependsOn": [
         {
           "attributes": [
@@ -8,7 +8,7 @@
             "Arn"
           ],
           "category": "function",
-          "resourceName": "ally845d9ca4"
+          "resourceName": "allyapp59297cf3"
         }
       ],
       "providerPlugin": "awscloudformation",
@@ -16,7 +16,7 @@
     }
   },
   "auth": {
-    "allyab79b52b": {
+    "allyapp3dc9dd13": {
       "customAuth": false,
       "dependsOn": [],
       "frontendAuthConfig": {
@@ -33,8 +33,7 @@
         ],
         "socialProviders": [],
         "usernameAttributes": [
-          "EMAIL",
-          "PHONE_NUMBER"
+          "EMAIL"
         ],
         "verificationMechanisms": [
           "EMAIL"
@@ -45,26 +44,26 @@
     }
   },
   "function": {
-    "ally845d9ca4": {
+    "allyapp59297cf3": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     }
   },
   "parameters": {
-    "AMPLIFY_function_ally845d9ca4_deploymentBucketName": {
+    "AMPLIFY_function_allyapp59297cf3_deploymentBucketName": {
       "usedBy": [
         {
           "category": "function",
-          "resourceName": "ally845d9ca4"
+          "resourceName": "allyapp59297cf3"
         }
       ]
     },
-    "AMPLIFY_function_ally845d9ca4_s3Key": {
+    "AMPLIFY_function_allyapp59297cf3_s3Key": {
       "usedBy": [
         {
           "category": "function",
-          "resourceName": "ally845d9ca4"
+          "resourceName": "allyapp59297cf3"
         }
       ]
     }

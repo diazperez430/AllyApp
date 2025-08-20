@@ -275,10 +275,13 @@ export default function HomeScreen() {
        console.log('Login error raw:', err);
        console.log('Login error keys:', Object.keys(err || {}));
        try { console.log('Login error JSON:', JSON.stringify(err, null, 2)); } catch {}
-   
-       
-       const code = err?.code || err?.name;
-       const message = err?.message || String(err);
+       const underlying = (err as any)?.underlyingError;
+       if (underlying) {
+         console.log('Underlying error:', underlying);
+         try { console.log('Underlying JSON:', JSON.stringify(underlying, null, 2)); } catch {}
+       }
+       const code = err?.code || err?.name || underlying?.code || underlying?.name;
+       const message = err?.message || underlying?.message || String(err);
        
        // Check for various ways AWS Cognito might indicate a user doesn't exist
        if (code === 'UserNotConfirmedException') {

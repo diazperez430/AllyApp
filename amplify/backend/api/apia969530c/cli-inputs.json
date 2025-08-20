@@ -1,9 +1,9 @@
 {
   "version": 1,
   "paths": {
-    "/v1/items": {
-      "name": "/v1/items",
-      "lambdaFunction": "ally845d9ca4",
+    "/items": {
+      "name": "/items",
+      "lambdaFunction": "allyapp59297cf3",
       "permissions": {
         "setting": "open"
       }

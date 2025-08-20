@@ -14,12 +14,16 @@ import {
   TextInput,
   Alert,
   AppState,
+  KeyboardAvoidingView,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/RootNavigator";
 import { useNavigation } from "@react-navigation/native";
-import { signIn, resendSignUpCode, fetchAuthSession, getCurrentUser, signInWithRedirect, fetchUserAttributes } from "aws-amplify/auth";
+import { signIn, resendSignUpCode, fetchAuthSession, getCurrentUser, signInWithRedirect, fetchUserAttributes } from "../utils/optionalAuth";
 import { Ionicons } from "@expo/vector-icons";
 import oauthHandler from "../utils/oauthHandler";
 
@@ -85,6 +89,7 @@ export default function HomeScreen() {
   // Login state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoginButtonHovered, setIsLoginButtonHovered] = useState(false);
   const [isCreateAccountButtonHovered, setIsCreateAccountButtonHovered] =
     useState(false);
@@ -356,116 +361,148 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>
-          <Pressable
-            onPressIn={handleAllyPressIn}
-            onPressOut={handleAllyPressOut}
-            onHoverIn={handleAllyPressIn}
-            onHoverOut={handleAllyPressOut}
-            style={{ alignSelf: "center" }}
-          >
-            <Animated.Text
-              style={[
-                styles.allyWordLarge,
-                { transform: [{ scale: allyScaleAnim }] },
-              ]}
-            >
-              Ally
-      
-            </Animated.Text>
-          </Pressable>
-        </Text>
-        
-        {/* Login Section */}
-        <View style={styles.loginSection}>
-          <TextInput
-            style={styles.input}
-            placeholder="Email Address"
-            placeholderTextColor="#999"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            placeholderTextColor="#999"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-          <Pressable
-            onPress={handleLogin}
-            onHoverIn={() => setIsLoginButtonHovered(true)}
-            onHoverOut={() => setIsLoginButtonHovered(false)}
-            style={({ pressed }) => [
-              styles.loginButton,
-              pressed && { opacity: 0.9 },
-            ]}
-          >
-            <Text
-              style={[
-                styles.loginButtonText,
-                isLoginButtonHovered && { color: "#cccccc" },
-              ]}
-            >
-              Log In
-            </Text>
-          </Pressable>
-                     <Pressable onPress={() => navigation.navigate('PasswordRecover')}>
-             <Text style={styles.forgotPassword}>Forgotten password?</Text>
-           </Pressable>
-        </View>
-
-        {/* Divider */}
-        <View style={styles.dividerContainer}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>or</Text>
-          <View style={styles.dividerLine} />
-        </View>
-
-        {/* Google Sign-In Button */}
-        <Pressable
-          onPress={handleGoogleSignIn}
-          disabled={isGoogleSigningIn}
-          style={({ pressed }) => [
-            styles.googleSignInButton,
-            pressed && { opacity: 0.9 },
-            isGoogleSigningIn && { opacity: 0.6 },
-          ]}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardAvoidingView}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      >
+        <KeyboardAwareScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+          enableOnAndroid
+          extraScrollHeight={20}
+          showsVerticalScrollIndicator={false}
         >
-          <Ionicons name="logo-google" size={20} color="#4285F4" />
-          <Text style={styles.googleSignInText}>
-            {isGoogleSigningIn ? 'Signing In...' : 'Continue with Google'}
-          </Text>
-        </Pressable>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.content}>
+              <Text style={styles.title}>
+                <Pressable
+                  onPressIn={handleAllyPressIn}
+                  onPressOut={handleAllyPressOut}
+                  onHoverIn={handleAllyPressIn}
+                  onHoverOut={handleAllyPressOut}
+                  style={{ alignSelf: "center" }}
+                >
+                  <Animated.Text
+                    style={[
+                      styles.allyWordLarge,
+                      { transform: [{ scale: allyScaleAnim }] },
+                    ]}
+                  >
+                    Ally
+      
+                  </Animated.Text>
+                </Pressable>
+              </Text>
+              
+              {/* Login Section */}
+              <View style={styles.loginSection}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Email Address"
+                  placeholderTextColor="#999"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  returnKeyType="next"
+                  blurOnSubmit={false}
+                />
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    style={styles.passwordInput}
+                    placeholder="Password"
+                    placeholderTextColor="#999"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!showPassword}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    returnKeyType="done"
+                    onSubmitEditing={handleLogin}
+                  />
+                  <Pressable
+                    onPress={() => setShowPassword(!showPassword)}
+                    style={styles.eyeButton}
+                  >
+                    <Ionicons 
+                      name={showPassword ? "eye-off-outline" : "eye-outline"} 
+                      size={20} 
+                      color="#6426A9" 
+                    />
+                  </Pressable>
+                </View>
+                <Pressable
+                  onPress={handleLogin}
+                  onHoverIn={() => setIsLoginButtonHovered(true)}
+                  onHoverOut={() => setIsLoginButtonHovered(false)}
+                  style={({ pressed }) => [
+                    styles.loginButton,
+                    pressed && { opacity: 0.9 },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.loginButtonText,
+                      isLoginButtonHovered && { color: "#cccccc" },
+                    ]}
+                  >
+                    Log In
+                  </Text>
+                </Pressable>
+                   <Pressable onPress={() => navigation.navigate('PasswordRecover')}>
+                  <Text style={styles.forgotPassword}>Forgotten password?</Text>
+                </Pressable>
+              </View>
 
-        <View style={styles.buttonContainer}>
-          <Pressable
-            onHoverIn={() => setIsCreateAccountButtonHovered(true)}
-            onHoverOut={() => setIsCreateAccountButtonHovered(false)}
-            onPress={() => navigation.navigate("SignUp")}
-            style={({ pressed }) => [
-              styles.createAccountButton,
-              pressed && { opacity: 0.9 },
-            ]}
-          >
-            <Text
-              style={[
-                styles.createAccountButtonText,
-                isCreateAccountButtonHovered && { color: "#cccccc" },
-              ]}
-            >
-              Create New Account
-            </Text>
-          </Pressable>
-        </View>
-      </View>
+              {/* Divider */}
+              <View style={styles.dividerContainer}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>or</Text>
+                <View style={styles.dividerLine} />
+              </View>
+
+              {/* Google Sign-In Button */}
+              <Pressable
+                onPress={handleGoogleSignIn}
+                disabled={isGoogleSigningIn}
+                style={({ pressed }) => [
+                  styles.googleSignInButton,
+                  pressed && { opacity: 0.9 },
+                  isGoogleSigningIn && { opacity: 0.6 },
+                ]}
+              >
+                <Ionicons name="logo-google" size={20} color="#4285F4" />
+                <Text style={styles.googleSignInText}>
+                  {isGoogleSigningIn ? 'Signing In...' : 'Continue with Google'}
+                </Text>
+              </Pressable>
+
+              <View style={styles.buttonContainer}>
+                <Pressable
+                  onHoverIn={() => setIsCreateAccountButtonHovered(true)}
+                  onHoverOut={() => setIsCreateAccountButtonHovered(false)}
+                  onPress={() => navigation.navigate("SignUp")}
+                  style={({ pressed }) => [
+                    styles.createAccountButton,
+                    pressed && { opacity: 0.9 },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.createAccountButtonText,
+                      isCreateAccountButtonHovered && { color: "#cccccc" },
+                    ]}
+                  >
+                    Create New Account
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAwareScrollView>
+      </KeyboardAvoidingView>
       <View style={styles.footbar}>
         <Text style={styles.footbarText}>© 2025 Ally</Text>
       </View>
@@ -484,6 +521,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: isTablet ? 60 : 20,
     paddingVertical: 40,
+  },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  scrollContainer: {
+    flexGrow: 1,
   },
   compassContainer: {
     alignItems: "center",
@@ -639,6 +682,33 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#e0d6ef",
     color: "#6426A9",
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e0d6ef",
+    marginBottom: 12,
+    height: isTablet ? 56 : 48,
+  },
+  passwordInput: {
+    flex: 1,
+    paddingHorizontal: isTablet ? 18 : 12,
+    fontSize: isTablet ? 18 : 15,
+    color: "#6426A9",
+    height: "100%",
+  },
+  eyeButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(100, 38, 169, 0.1)",
+    borderRadius: 4,
+    minWidth: 44,
+    minHeight: 44,
   },
   loginButton: {
     backgroundColor: "#6426A9",

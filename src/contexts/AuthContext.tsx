@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { signIn, signUp, confirmSignUp, signOut, getCurrentUser, resetPassword, confirmResetPassword, fetchAuthSession } from 'aws-amplify/auth';
+import { signIn, signUp, confirmSignUp, signOut, getCurrentUser, resetPassword, confirmResetPassword, fetchAuthSession } from '../utils/optionalAuth';
 import { Hub } from 'aws-amplify/utils';
 
 interface CognitoTokens {

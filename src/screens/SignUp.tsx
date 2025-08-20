@@ -13,18 +13,27 @@ import {
   TextInput,
   TouchableWithoutFeedback,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  Keyboard,
 } from "react-native";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
-import { signUp } from 'aws-amplify/auth';
-import awsconfig from '../aws-exports.js';
+import { signUp } from '../utils/optionalAuth';
+// awsconfig optional; avoid direct import when backend is removed
+let awsconfig: any = null;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const maybe = require('../aws-exports.js');
+  awsconfig = maybe?.default ?? maybe;
+} catch {}
 import { RootStackParamList } from "../navigation/RootNavigator";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useState, useEffect } from "react";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 const isTablet = screenWidth >= 768;
@@ -50,6 +59,8 @@ export default function SignUp() {
   const [mobile, setMobile] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
   const [firstNameError, setFirstNameError] = React.useState("");
   const [surnameError, setSurnameError] = React.useState("");
   const [dobError, setDobError] = React.useState("");
@@ -211,9 +222,11 @@ export default function SignUp() {
       });
       
       // Log AWS configuration for debugging
-      console.log("AWS Region:", awsconfig.aws_cognito_region);
-      console.log("User Pool ID:", awsconfig.aws_user_pools_id);
-      console.log("Verification mechanisms:", awsconfig.aws_cognito_verification_mechanisms);
+      if (awsconfig) {
+        console.log("AWS Region:", awsconfig.aws_cognito_region);
+        console.log("User Pool ID:", awsconfig.aws_user_pools_id);
+        console.log("Verification mechanisms:", awsconfig.aws_cognito_verification_mechanisms);
+      }
       
       const result = await signUp({
         username: email, // use email as username
@@ -276,188 +289,236 @@ export default function SignUp() {
   };
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.content}>
-          <Text style={styles.title}>
-            <Pressable
-              onPressIn={handleAllyPressIn}
-              onPressOut={handleAllyPressOut}
-              onHoverIn={handleAllyPressIn}
-              onHoverOut={handleAllyPressOut}
-              style={{ alignSelf: "center" }}
-            >
-              <Animated.Text
-                style={[
-                  styles.allyWordLarge,
-                  { transform: [{ scale: allyScaleAnim }] },
-                ]}
-              >
-                Ally
-              </Animated.Text>
-            </Pressable>
-          </Text>
-          <Text style={styles.signupSubtitle}>Create a new Account</Text>
-          <View style={styles.signupForm}>
-            <View style={styles.nameRow}>
-              <View style={styles.nameInputContainer}>
-                <TextInput
-                  style={[styles.input, styles.nameInput]}
-                  placeholder="First name"
-                  placeholderTextColor="#999"
-                  value={firstName}
-                  onChangeText={setFirstName}
-                  autoCapitalize="words"
-                  autoCorrect={false}
-                />
-                {firstNameError ? (
-                  <Text style={styles.errorText}>{firstNameError}</Text>
-                ) : null}
-              </View>
-              <View style={styles.nameInputContainer}>
-                <TextInput
-                  style={[styles.input, styles.nameInput, { marginRight: 0 }]}
-                  placeholder="Surname"
-                  placeholderTextColor="#999"
-                  value={surname}
-                  onChangeText={setSurname}
-                  autoCapitalize="words"
-                  autoCorrect={false}
-                />
-                {surnameError ? (
-                  <Text style={styles.errorText}>{surnameError}</Text>
-                ) : null}
-              </View>
-            </View>
-            <TextInput
-              style={styles.input}
-              placeholder="Date of birth (DD/MM/YYYY)"
-              placeholderTextColor="#999"
-              value={dob}
-              onChangeText={setDob}
-              autoCapitalize="none"
-              autoCorrect={false}
-              onPressIn={() => setShowPicker(true)}
-            />
-            {dobError ? <Text style={styles.errorText}>{dobError}</Text> : null}
-            {showPicker && (
-              <View style={styles.datePickerContainer}>
-                <DateTimePicker
-                  value={date}
-                  mode="date"
-                  display="spinner"
-                  onChange={handleDateChange}
-                  maximumDate={new Date()}
-                />
-                {Platform.OS === "ios" && (
-                  <TouchableOpacity
-                    style={styles.closePickerButton}
-                    onPress={() => setShowPicker(false)}
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardAvoidingView}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      >
+        <KeyboardAwareScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          enableOnAndroid
+          extraScrollHeight={20}
+        >
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.content}>
+              <Text style={styles.title}>
+                <Pressable
+                  onPressIn={handleAllyPressIn}
+                  onPressOut={handleAllyPressOut}
+                  onHoverIn={handleAllyPressIn}
+                  onHoverOut={handleAllyPressOut}
+                  style={{ alignSelf: "center" }}
+                >
+                  <Animated.Text
+                    style={[
+                      styles.allyWordLarge,
+                      { transform: [{ scale: allyScaleAnim }] },
+                    ]}
                   >
-                    <Text style={styles.closePickerButtonText}>Done</Text>
-                  </TouchableOpacity>
+                    Ally
+                  </Animated.Text>
+                </Pressable>
+              </Text>
+              <Text style={styles.signupSubtitle}>Create a new Account</Text>
+              <View style={styles.signupForm}>
+                <View style={styles.nameRow}>
+                  <View style={styles.nameInputContainer}>
+                    <TextInput
+                      style={[styles.input, styles.nameInput]}
+                      placeholder="First name"
+                      placeholderTextColor="#999"
+                      value={firstName}
+                      onChangeText={setFirstName}
+                      autoCapitalize="words"
+                      autoCorrect={false}
+                      returnKeyType="next"
+                      blurOnSubmit={false}
+                    />
+                    {firstNameError ? (
+                      <Text style={styles.errorText}>{firstNameError}</Text>
+                    ) : null}
+                  </View>
+                  <View style={styles.nameInputContainer}>
+                    <TextInput
+                      style={[styles.input, styles.nameInput, { marginRight: 0 }]}
+                      placeholder="Surname"
+                      placeholderTextColor="#999"
+                      value={surname}
+                      onChangeText={setSurname}
+                      autoCapitalize="words"
+                      autoCorrect={false}
+                      returnKeyType="next"
+                      blurOnSubmit={false}
+                    />
+                    {surnameError ? (
+                      <Text style={styles.errorText}>{surnameError}</Text>
+                    ) : null}
+                  </View>
+                </View>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Date of birth (DD/MM/YYYY)"
+                  placeholderTextColor="#999"
+                  value={dob}
+                  onChangeText={setDob}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  onPressIn={() => setShowPicker(true)}
+                  returnKeyType="next"
+                  blurOnSubmit={false}
+                />
+                {dobError ? <Text style={styles.errorText}>{dobError}</Text> : null}
+                {showPicker && (
+                  <View style={styles.datePickerContainer}>
+                    <DateTimePicker
+                      value={date}
+                      mode="date"
+                      display="spinner"
+                      onChange={handleDateChange}
+                      maximumDate={new Date()}
+                    />
+                    {Platform.OS === "ios" && (
+                      <TouchableOpacity
+                        style={styles.closePickerButton}
+                        onPress={() => setShowPicker(false)}
+                      >
+                        <Text style={styles.closePickerButtonText}>Done</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
                 )}
+                
+                
+                                <TextInput
+                  style={styles.input}
+                  placeholder="Email address"
+                  placeholderTextColor="#999"
+                  value={email}
+                  onChangeText={setEmail}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  keyboardType="email-address"
+                  returnKeyType="next"
+                  blurOnSubmit={false}
+                />
+                {emailError ? (
+                  <Text style={styles.errorText}>{emailError}</Text>
+                ) : null}
+                
+                <TextInput
+                  style={styles.input}
+                  placeholder="Mobile number"
+                  placeholderTextColor="#999"
+                  value={mobile}
+                  onChangeText={setMobile}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  keyboardType="phone-pad"
+                  returnKeyType="next"
+                  blurOnSubmit={false}
+                />
+                {mobileError ? (
+                  <Text style={styles.errorText}>{mobileError}</Text>
+                ) : null}
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    style={styles.passwordInput}
+                    placeholder="New password"
+                    placeholderTextColor="#999"
+                    value={password}
+                    onChangeText={setPassword}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    secureTextEntry={!showPassword}
+                    returnKeyType="next"
+                    blurOnSubmit={false}
+                  />
+                  <Pressable
+                    onPress={() => setShowPassword(!showPassword)}
+                    style={styles.showPasswordButton}
+                  >
+                    <Ionicons
+                      name={showPassword ? "eye-off-outline" : "eye-outline"}
+                      size={20}
+                      color="#6426A9"
+                    />
+                  </Pressable>
+                </View>
+                {passwordError ? (
+                  <Text style={styles.errorText}>{passwordError}</Text>
+                ) : null}
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    style={styles.passwordInput}
+                    placeholder="Confirm password"
+                    placeholderTextColor="#999"
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    secureTextEntry={!showConfirmPassword}
+                    returnKeyType="done"
+                    onSubmitEditing={handleSignUp}
+                  />
+                  <Pressable
+                    onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                    style={styles.showPasswordButton}
+                  >
+                    <Ionicons
+                      name={showConfirmPassword ? "eye-off-outline" : "eye-outline"}
+                      size={20}
+                      color="#6426A9"
+                    />
+                  </Pressable>
+                </View>
+                {confirmPasswordError ? (
+                  <Text style={styles.errorText}>{confirmPasswordError}</Text>
+                ) : null}
+                <Pressable
+                  onPress={handleSignUp}
+                  onHoverIn={() => setIsButtonHovered(true)}
+                  onHoverOut={() => setIsButtonHovered(false)}
+                  disabled={isLoading}
+                  style={({ pressed }) => [
+                    styles.signupButton,
+                    pressed && { opacity: 0.9 },
+                    isLoading && { opacity: 0.6 },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.signupButtonText,
+                      isButtonHovered && { color: "#cccccc" },
+                    ]}
+                  >
+                    {isLoading ? "Creating Account..." : "Sign up"}
+                  </Text>
+                </Pressable>
+                
+                <Text style={styles.orText}>or</Text>
+                
+                <Pressable
+                  onPress={() => navigation.navigate("Auth")}
+                  style={({ pressed }) => [
+                    styles.loginButton,
+                    pressed && { opacity: 0.9 },
+                  ]}
+                >
+                  <Text style={styles.loginButtonText}>
+                    Log in
+                  </Text>
+                </Pressable>
+                
+                <Text style={styles.loginPromptText}>
+                  If you already have an account
+                </Text>
               </View>
-            )}
-            
-            
-                         <TextInput
-               style={styles.input}
-               placeholder="Email address"
-               placeholderTextColor="#999"
-               value={email}
-               onChangeText={setEmail}
-               autoCapitalize="none"
-               autoCorrect={false}
-               keyboardType="email-address"
-             />
-             {emailError ? (
-               <Text style={styles.errorText}>{emailError}</Text>
-             ) : null}
-             
-             <TextInput
-               style={styles.input}
-               placeholder="Mobile number"
-               placeholderTextColor="#999"
-               value={mobile}
-               onChangeText={setMobile}
-               autoCapitalize="none"
-               autoCorrect={false}
-               keyboardType="phone-pad"
-             />
-             {mobileError ? (
-               <Text style={styles.errorText}>{mobileError}</Text>
-             ) : null}
-            <View style={styles.passwordContainer}>
-              <TextInput
-                style={styles.passwordInput}
-                placeholder="New password"
-                placeholderTextColor="#999"
-                value={password}
-                onChangeText={setPassword}
-                autoCapitalize="none"
-                autoCorrect={false}
-                secureTextEntry={true}
-              />
             </View>
-            {passwordError ? (
-              <Text style={styles.errorText}>{passwordError}</Text>
-            ) : null}
-            <View style={styles.passwordContainer}>
-              <TextInput
-                style={styles.passwordInput}
-                placeholder="Confirm password"
-                placeholderTextColor="#999"
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                autoCapitalize="none"
-                autoCorrect={false}
-                secureTextEntry={true}
-              />
-            </View>
-            {confirmPasswordError ? (
-              <Text style={styles.errorText}>{confirmPasswordError}</Text>
-            ) : null}
-            <Pressable
-              onPress={handleSignUp}
-              onHoverIn={() => setIsButtonHovered(true)}
-              onHoverOut={() => setIsButtonHovered(false)}
-              disabled={isLoading}
-              style={({ pressed }) => [
-                styles.signupButton,
-                pressed && { opacity: 0.9 },
-                isLoading && { opacity: 0.6 },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.signupButtonText,
-                  isButtonHovered && { color: "#cccccc" },
-                ]}
-              >
-                {isLoading ? "Creating Account..." : "Sign up"}
-              </Text>
-            </Pressable>
-            
-            <Text style={styles.orText}>or</Text>
-            
-            <Pressable
-              onPress={() => navigation.navigate("Auth")}
-              style={({ pressed }) => [
-                styles.loginButton,
-                pressed && { opacity: 0.9 },
-              ]}
-            >
-              <Text style={styles.loginButtonText}>
-                Log in
-              </Text>
-            </Pressable>
-            
-            <Text style={styles.loginPromptText}>
-              If you already have an account
-            </Text>
-          </View>
-        </View>
-      </ScrollView>
+          </TouchableWithoutFeedback>
+        </KeyboardAwareScrollView>
+      </KeyboardAvoidingView>
       <View style={styles.footbar}>
         <Text style={styles.footbarText}>© 2025 Ally</Text>
       </View>
@@ -722,5 +783,18 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginVertical: 8,
     fontWeight: "600",
+  },
+  showPasswordButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(100, 38, 169, 0.1)",
+    borderRadius: 4,
+    minWidth: 44,
+    minHeight: 44,
+  },
+  keyboardAvoidingView: {
+    flex: 1,
   },
 });

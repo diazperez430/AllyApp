@@ -1,4 +1,18 @@
-import { get, post, put, del } from 'aws-amplify/api';
+
+let apiModule: any;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  apiModule = require('aws-amplify/api');
+} catch {
+  apiModule = {
+    get: () => { throw new Error('Amplify API not available'); },
+    post: () => { throw new Error('Amplify API not available'); },
+    put: () => { throw new Error('Amplify API not available'); },
+    del: () => { throw new Error('Amplify API not available'); },
+  };
+}
+const { get, post, put, del } = apiModule;
+
 import { ensureValidTokens, createAuthHeaders, CognitoTokens } from './utils/tokenManager';
 
 // Utility function to get auth headers
